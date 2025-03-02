@@ -49,7 +49,7 @@ class User(AbstractBaseUser):
     )
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    rome = models.CharField(
+    role = models.CharField(
         max_length=20,
         choices=UserTypeChoices.choices,
         default=UserTypeChoices.WAIT_STAFF,
