@@ -7,9 +7,12 @@ from django.views import View
 
 class UpdateView(View):
     def get(self, request):
+        print(request.headers)
         expected_header_key = "X-SECRET-KEY"
         expected_header_value = settings.DEPLOY_SECRET_KEY
         received_header_value = request.headers.get(expected_header_key)
+        print(f"Received Header: {received_header_value}")
+        print(f"Expected Header: {expected_header_value}")
 
         if received_header_value != expected_header_value:
             return JsonResponse(
