@@ -1,5 +1,3 @@
-from rest_framework.response import Response
-from rest_framework import status
 from .models import User
 from .serializers import SignUpSerializer, UserSerializer
 from rest_framework.generics import CreateAPIView
@@ -7,13 +5,16 @@ from rest_framework.viewsets import ModelViewSet
 
 
 class SignUpView(CreateAPIView):
+    queryset = User.objects.all()
     serializer_class = SignUpSerializer
+    """def create(self, request, *args, **kwargs):
+        print("Received data:", request.data)
+        print("Using serializer:", self.get_serializer_class())
 
-    def create(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(status=status.HTTP_201_CREATED)
+        self.perform_create(serializer)
+        return Response(status=status.HTTP_201_CREATED) """
 
 
 class UserView(ModelViewSet):
