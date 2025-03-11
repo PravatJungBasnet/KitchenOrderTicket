@@ -49,11 +49,13 @@ class User(AbstractBaseUser):
     )
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
+    password = models.CharField(max_length=100)
     role = models.CharField(
         max_length=20,
         choices=UserTypeChoices.choices,
         default=UserTypeChoices.WAIT_STAFF,
     )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
