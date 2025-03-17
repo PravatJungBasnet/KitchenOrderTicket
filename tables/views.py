@@ -1,9 +1,6 @@
-from rest_framework.response import Response
-from .models import Tables, Menu, Order, Billing, PaymentStatus
+from .models import Tables, Menu, Order
 from .serilaizers import TableSerializer, MenuSerializer, OrderSerializer
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.views import APIView
-from rest_framework import status
 from drf_spectacular.utils import extend_schema
 
 
@@ -31,7 +28,7 @@ class OrderViewSet(ModelViewSet):
     search_fields = ["id", "status"]
 
 
-@extend_schema(tags=["Billing"])
+"""@extend_schema(tags=["Billing"])
 class BillingView(APIView):
     def get(self, request, table_id):
         try:
@@ -44,4 +41,4 @@ class BillingView(APIView):
         billing = Billing.objects.get(table=table, status=PaymentStatus.PENDING)
         return Response(
             {"table_id": table.id, "total_bill": billing.order.total_amount}
-        )
+        ) """
