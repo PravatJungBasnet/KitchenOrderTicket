@@ -39,7 +39,7 @@ class TableSerializer(BaseSerializer):
 class MenuSerializer(serializers.ModelSerializer):
     class Meta:
         model = Menu
-        fields = ["id", "name", "price", "image", "is_available"]
+        fields = ["id", "category", "name", "price", "image", "is_available"]
 
 
 class TableBriefSerializer(BaseSerializer):
@@ -51,7 +51,7 @@ class TableBriefSerializer(BaseSerializer):
 class MenuBriefSerializer(BaseSerializer):
     class Meta:
         model = Menu
-        fields = ["id", "name"]
+        fields = ["id", "category" "name"]
 
 
 class OrderSerializer(BaseSerializer):
