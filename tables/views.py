@@ -33,7 +33,7 @@ class OrderViewSet(ModelViewSet):
     search_fields = ["id", "status"]
 
 
-@extend_schema(tags=["Order"])
+@extend_schema(tags=["Category"])
 class CategoryViewSet(ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
