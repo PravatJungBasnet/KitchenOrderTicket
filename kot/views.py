@@ -20,7 +20,7 @@ class UpdateView(View):
             )
 
         try:
-            script_path = "/home/pravat/KitchenOrderTicket/deploy.sh"
+            script_path = "/home/Pravat/KitchenOrderTicket/deploy.sh"
             subprocess.Popen(
                 ["bash", script_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE
             )
