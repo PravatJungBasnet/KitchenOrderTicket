@@ -36,10 +36,19 @@ class TableSerializer(BaseSerializer):
         fields = ["id", "number", "is_occupied"]
 
 
+class CategoryBriefSerializer(BaseSerializer):
+    class Meta:
+        model = Category
+        fields = ["id", "name"]
+
+
 class MenuSerializer(serializers.ModelSerializer):
     class Meta:
         model = Menu
         fields = ["id", "category", "name", "price", "image", "is_available"]
+        serialize_fields = {
+            "category": CategoryBriefSerializer,
+        }
 
 
 class TableBriefSerializer(BaseSerializer):
@@ -57,7 +66,10 @@ class CategorySerializer(BaseSerializer):
 class MenuBriefSerializer(BaseSerializer):
     class Meta:
         model = Menu
-        fields = ["id", "category", "name"]
+        fields = ["id", "category", "name", "price"]
+        serialize_fields = {
+            "category": CategoryBriefSerializer,
+        }
 
 
 class OrderSerializer(BaseSerializer):
