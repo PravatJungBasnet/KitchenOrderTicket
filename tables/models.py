@@ -48,9 +48,13 @@ class Order(models.Model):
     )
     timestamp = models.DateTimeField(auto_now_add=True)
 
+    """@property
+    def total_amount(self):
+        return self.menu.price * self.quantity """
+
     @property
     def total_amount(self):
-        return self.menu.price * self.quantity
+        return sum(menu_item.price for menu_item in self.menu.all()) * self.quantity
 
 
 class Billing(models.Model):
