@@ -1,6 +1,7 @@
 #!/bin/bash
 git pull origin main
-workon venv
+#workon venv
+source /home/Pravat/venv/bin/activate
 pip install -r requirements.txt --no-cache-dir
 python manage.py migrate
 python manage.py collectstatic --noinput
