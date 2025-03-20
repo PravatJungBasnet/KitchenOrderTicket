@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Tables, Menu, Order, Billing, Category
+from .models import Tables, Menu, Order, Billing, Category, OrderItem
 
 
 class BaseSerializer(serializers.ModelSerializer):
@@ -75,7 +75,7 @@ class MenuBriefSerializer(BaseSerializer):
 class OrderSerializer(BaseSerializer):
     class Meta:
         model = Order
-        fields = ["id", "menu", "table", "quantity", "status", "total_amount"]
+        fields = ["id", "menu", "table", "status", "total_amount"]
         serialize_fields = {
             "table": TableBriefSerializer,
             "menu": MenuBriefSerializer,
@@ -86,6 +86,13 @@ class OrderBriefSerializer(BaseSerializer):
     class Meta:
         model = Order
         fields = ["id", "total_amount"]
+
+
+class OrderItemSerializer(BaseSerializer):
+    class Meta:
+        model = OrderItem
+        fields = ["order", "menu", "quantity"]
+        serialize_fields = {"menu": MenuBriefSerializer}
 
 
 class BillingSerializer(BaseSerializer):

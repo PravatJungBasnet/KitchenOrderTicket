@@ -1,9 +1,10 @@
-from .models import Tables, Menu, Order, Category
+from .models import Tables, Menu, Order, Category, OrderItem
 from .serilaizers import (
     TableSerializer,
     MenuSerializer,
     OrderSerializer,
     CategorySerializer,
+    OrderItemSerializer,
 )
 from rest_framework.viewsets import ModelViewSet
 from drf_spectacular.utils import extend_schema
@@ -39,6 +40,12 @@ class CategoryViewSet(ModelViewSet):
     serializer_class = CategorySerializer
     filterset_fields = ["id", "name"]
     search_fields = ["id", "name"]
+
+
+@extend_schema(tags=["OrderItem"])
+class OrderItemViewSet(ModelViewSet):
+    queryset = OrderItem.objects.all()
+    serializer_class = OrderItemSerializer
 
 
 """@extend_schema(tags=["Billing"])
