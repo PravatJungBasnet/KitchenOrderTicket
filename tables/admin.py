@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Tables, Menu, Order, Category
+from .models import Tables, Menu, Order, Category, OrderItem
 
 
 @admin.register(Tables)
@@ -10,6 +10,11 @@ class TableAdmin(admin.ModelAdmin):
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ["name"]
+
+
+@admin.register(OrderItem)
+class OrderItemAdmin(admin.ModelAdmin):
+    list_display = ["order"]
 
 
 @admin.register(Menu)

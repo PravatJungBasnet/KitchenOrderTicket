@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models import Sum, F
+from decimal import Decimal
 
 
 class OrderStatus(models.TextChoices):
@@ -41,20 +43,28 @@ class Menu(models.Model):
 
 class Order(models.Model):
     table = models.ForeignKey(Tables, on_delete=models.CASCADE)
-    menu = models.ManyToManyField(Menu)
-    quantity = models.IntegerField()
+    menu = models.ManyToManyField(Menu, through="OrderItem")
+    # quantity = models.IntegerField()
     status = models.CharField(
         max_length=100, choices=OrderStatus.choices, default=OrderStatus.PENDING
     )
     timestamp = models.DateTimeField(auto_now_add=True)
 
-    """@property
-    def total_amount(self):
-        return self.menu.price * self.quantity """
-
     @property
     def total_amount(self):
-        return sum(menu_item.price for menu_item in self.menu.all()) * self.quantity
+        total = self.items.aggregate(total=Sum(F("quantity") * F("menu__price")))[
+            "total"
+        ]
+        return total if total is not None else Decimal(0)
+
+    def __str__(self):
+        return f"{self.table}"
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
+    menu = models.ForeignKey(Menu, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
 
 
 class Billing(models.Model):
