@@ -1,4 +1,5 @@
-from .models import Tables, Menu, Order, Category, OrderItem
+from rest_framework.response import Response
+from .models import OrderStatus, PaymentStatus, Tables, Menu, Order, Category, OrderItem
 from .serilaizers import (
     TableSerializer,
     MenuSerializer,
@@ -7,6 +8,7 @@ from .serilaizers import (
     OrderItemSerializer,
 )
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.decorators import action
 from drf_spectacular.utils import extend_schema
 
 
@@ -32,6 +34,28 @@ class OrderViewSet(ModelViewSet):
     serializer_class = OrderSerializer
     filterset_fields = ["id", "status"]
     search_fields = ["id", "status"]
+
+    @action(
+        detail=False, methods=["get"], name="recently-order", url_path="recently-order"
+    )
+    def recently_order(self, request):
+        order = Order.objects.order_by("-id").filter(
+            payment_status=PaymentStatus.PENDING
+        )[:10]
+        serializer = self.get_serializer(order, many=True)
+        return Response({"data": serializer.data})
+
+    @action(
+        detail=False, methods=["get"], name="order-history", url_path="order-history"
+    )
+    def order_history(self, request):
+        order = (
+            Order.objects.order_by("-timestamp")
+            .filter(payment_status=PaymentStatus.PAID, status=OrderStatus.COMPLETED)
+            .order_by("-timestamp")
+        )
+        serializer = self.get_serializer(order, many=True)
+        return Response({"data": serializer.data})
 
 
 @extend_schema(tags=["Category"])
