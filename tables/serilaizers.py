@@ -75,7 +75,7 @@ class MenuBriefSerializer(BaseSerializer):
 class OrderSerializer(BaseSerializer):
     class Meta:
         model = Order
-        fields = ["id", "menu", "table", "status", "total_amount"]
+        fields = ["id", "menu", "table", "status", "total_amount", "payment_status"]
         serialize_fields = {
             "table": TableBriefSerializer,
             "menu": MenuBriefSerializer,

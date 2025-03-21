@@ -44,9 +44,11 @@ class Menu(models.Model):
 class Order(models.Model):
     table = models.ForeignKey(Tables, on_delete=models.CASCADE)
     menu = models.ManyToManyField(Menu, through="OrderItem")
-    # quantity = models.IntegerField()
     status = models.CharField(
         max_length=100, choices=OrderStatus.choices, default=OrderStatus.PENDING
+    )
+    payment_status = models.CharField(
+        max_length=100, choices=PaymentStatus.choices, default=PaymentStatus.PENDING
     )
     timestamp = models.DateTimeField(auto_now_add=True)
 
