@@ -66,7 +66,7 @@ class CategorySerializer(BaseSerializer):
 class MenuBriefSerializer(BaseSerializer):
     class Meta:
         model = Menu
-        fields = ["id", "category", "name", "price"]
+        fields = ["id", "category", "name", "price", "image"]
         serialize_fields = {
             "category": CategoryBriefSerializer,
         }
