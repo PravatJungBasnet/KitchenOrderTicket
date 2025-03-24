@@ -91,7 +91,7 @@ class OrderBriefSerializer(BaseSerializer):
 class OrderItemSerializer(BaseSerializer):
     class Meta:
         model = OrderItem
-        fields = ["order", "menu", "quantity"]
+        fields = ["id", "order", "menu", "quantity"]
         serialize_fields = {"menu": MenuBriefSerializer}
 
 
