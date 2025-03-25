@@ -5,6 +5,7 @@ from decimal import Decimal
 
 class OrderStatus(models.TextChoices):
     PENDING = "Pending", "Pending"
+    SERVED = "Served", "Served"
     COMPLETED = "Completed", "Completed"
 
 

@@ -42,7 +42,7 @@ class OrderViewSet(ModelViewSet):
     )
     def recently_order(self, request):
         order = Order.objects.order_by("-id").filter(
-            payment_status=PaymentStatus.PENDING
+            payment_status=PaymentStatus.PAID, status=OrderStatus.PENDING
         )[:10]
         serializer = self.get_serializer(order, many=True)
         return Response({"data": serializer.data})
@@ -58,6 +58,89 @@ class OrderViewSet(ModelViewSet):
         )
         serializer = self.get_serializer(order, many=True)
         return Response({"data": serializer.data})
+
+    @action(
+        detail=True,
+        methods=["post"],
+        url_path="add-items",
+        serializer_class=OrderItemSerializer,
+    )
+    def add_items_to_order(self, request, pk=None):
+        try:
+            order = self.get_object()
+
+            if order.status == OrderStatus.COMPLETED:
+                return Response(
+                    {"error": "Cannot modify a completed order"}, status=400
+                )
+
+            menu_items = request.data.get("menu_items")
+
+            if menu_items is None:
+                menu_id = request.data.get("menu")
+                quantity = request.data.get("quantity")
+
+                if menu_id is None and quantity is None:
+                    return Response(
+                        {"error": "Invalid payload. Provide either  menu and quantity"},
+                        status=400,
+                    )
+
+                menu_items = [{"menu_id": menu_id, "quantity": quantity}]
+
+            if not menu_items:
+                return Response({"error": "No menu items provided"}, status=400)
+
+            # Add items to the order
+            added_items = []
+            for item in menu_items:
+                try:
+                    menu = Menu.objects.get(id=item.get("menu_id"))
+
+                    # Check if item already exists in order
+                    existing_order_item = OrderItem.objects.filter(
+                        order=order, menu=menu
+                    ).first()
+
+                    if existing_order_item:
+                        # Update existing item quantity
+                        existing_order_item.quantity += item["quantity"]
+                        existing_order_item.save()
+                        added_items.append(
+                            {
+                                "menu_id": menu.id,
+                                "menu_name": menu.name,
+                                "quantity": item["quantity"],
+                                "status": "updated",
+                            }
+                        )
+                    else:
+                        added_items.append(
+                            {
+                                "menu_id": menu.id,
+                                "menu_name": menu.name,
+                                "quantity": item["quantity"],
+                                "status": "added",
+                            }
+                        )
+
+                except Menu.DoesNotExist:
+                    return Response(
+                        {"error": f"Menu item with ID {item.get('menu_id')} not found"},
+                        status=404,
+                    )
+
+            return Response(
+                {
+                    "message": "Items added successfully",
+                    "added_items": added_items,
+                    "total_amount": order.total_amount,
+                },
+                status=200,
+            )
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
 
 
 @extend_schema(tags=["Category"])
