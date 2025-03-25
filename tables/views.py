@@ -1,4 +1,6 @@
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
 from .models import OrderStatus, PaymentStatus, Tables, Menu, Order, Category, OrderItem
 from .serilaizers import (
     TableSerializer,
@@ -72,17 +74,56 @@ class OrderItemViewSet(ModelViewSet):
     serializer_class = OrderItemSerializer
 
 
-"""@extend_schema(tags=["Billing"])
+@extend_schema(tags=["Billing"])
 class BillingView(APIView):
-    def get(self, request, table_id):
-        try:
-            table = Tables.objects.get(id=table_id)
-        except Tables.DoesNotExist:
+    def get(self, request, *args, **kwargs):
+        table_id = kwargs.get("table_id")
+        table = get_object_or_404(Tables, id=table_id)
+
+        order = (
+            Order.objects.order_by("-timestamp")
+            .filter(
+                table=table,
+                payment_status=PaymentStatus.PAID,
+                status=OrderStatus.COMPLETED,
+            )
+            .first()
+        )
+
+        if not order:
             return Response(
-                {"message": "Table not found"}, status=status.HTTP_404_NOT_FOUND
+                {"message": "No completed and paid orders found for this table"},
+                status=404,
             )
 
-        billing = Billing.objects.get(table=table, status=PaymentStatus.PENDING)
-        return Response(
-            {"table_id": table.id, "total_bill": billing.order.total_amount}
-        ) """
+        # Fetch ordered items with quantity
+        order_items = OrderItem.objects.filter(order=order).select_related("menu")
+
+        invoice_items = []
+        subtotal = 0
+
+        for item in order_items:
+            quantity = item.quantity
+            unit_price = float(item.menu.price)
+            total_price = unit_price * quantity
+
+            invoice_items.append(
+                {
+                    "name": item.menu.name,
+                    "quantity": quantity,
+                    "unit_price": unit_price,
+                    "total_price": total_price,
+                }
+            )
+
+            subtotal += total_price
+
+        invoice_data = {
+            "invoice_id": f"INV-{order.id:06}",  # Example: INV-000013
+            "date": order.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+            "table_number": order.table.number,
+            "items": invoice_items,
+            "total": round(subtotal, 2),
+        }
+
+        return Response(invoice_data)
