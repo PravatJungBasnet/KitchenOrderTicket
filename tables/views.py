@@ -115,6 +115,10 @@ class OrderViewSet(ModelViewSet):
                             }
                         )
                     else:
+                        # Create new order item
+                        _ = OrderItem.objects.create(
+                            order=order, menu=menu, quantity=item["quantity"]
+                        )
                         added_items.append(
                             {
                                 "menu_id": menu.id,
