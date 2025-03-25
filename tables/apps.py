@@ -6,4 +6,4 @@ class TablesConfig(AppConfig):
     name = "tables"
 
     def ready(self):
-        pass
+        import tables.signals  # noqa: F401
