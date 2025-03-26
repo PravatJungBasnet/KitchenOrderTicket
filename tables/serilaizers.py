@@ -42,7 +42,7 @@ class CategoryBriefSerializer(BaseSerializer):
         fields = ["id", "name"]
 
 
-class MenuSerializer(serializers.ModelSerializer):
+class MenuSerializer(BaseSerializer):
     class Meta:
         model = Menu
         fields = ["id", "category", "name", "price", "image", "is_available"]

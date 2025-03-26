@@ -41,7 +41,10 @@ class OrderViewSet(ModelViewSet):
         detail=False, methods=["get"], name="recently-order", url_path="recently-order"
     )
     def recently_order(self, request):
-        order = Order.objects.order_by("-id").filter(status=OrderStatus.PENDING)[:10]
+        order = Order.objects.order_by("-id").filter(
+            status__in=[OrderStatus.PENDING, OrderStatus.SERVED, OrderStatus.COMPLETED],
+            payment_status=PaymentStatus.PENDING,
+        )[:10]
         serializer = self.get_serializer(order, many=True)
         return Response({"data": serializer.data})
 
