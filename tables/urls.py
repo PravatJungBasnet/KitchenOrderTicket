@@ -7,6 +7,7 @@ from .views import (
     CategoryViewSet,
     OrderItemViewSet,
     BillingView,
+    MostSoldItemsDailyAPIView,
 )
 
 router = DefaultRouter()
@@ -21,6 +22,7 @@ router.register("", TableViewSet, basename="tables")
 urlpatterns = [
     # path("<int:table_id>/", BillingView.as_view(), name="billing"),
     # path('order/<int:id>/update-order/', UpdateOrderView.as_view(), name='update-order'),
+    path("daily/", MostSoldItemsDailyAPIView.as_view(), name="most-sold-items-daily"),
     path("billing/<int:table_id>/", BillingView.as_view(), name="billing"),
     path("", include(router.urls)),
 ]
