@@ -37,10 +37,8 @@ def clear_table_after_order_delete(sender, instance, **kwargs):
 def handle_table_change(sender, instance, **kwargs):
     """Make old table available if order is moved to a new table."""
     if instance.pk:
-        print(instance.pk)  # Check if this is an update
         try:
             old_instance = Order.objects.get(pk=instance.pk)
-            print(old_instance, "hello")
             if old_instance.table != instance.table:
                 old_table = old_instance.table
                 old_table.is_occupied = False

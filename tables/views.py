@@ -9,6 +9,9 @@ from .serilaizers import (
     CategorySerializer,
     OrderItemSerializer,
 )
+from django.utils.timezone import now
+from django.db.models import Sum, F
+from collections import defaultdict
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from drf_spectacular.utils import extend_schema
@@ -28,6 +31,14 @@ class MenuViewSet(ModelViewSet):
     serializer_class = MenuSerializer
     filterset_fields = ["name", "price"]
     search_fields = ["name", "price"]
+
+    def list(self, request, *args, **kwargs):
+        menus = self.get_queryset()
+        categorized_data = defaultdict(list)
+        for menu in menus:
+            serialized_data = self.get_serializer(menu).data
+            categorized_data[menu.category.name].append(serialized_data)
+        return Response({"data": categorized_data})
 
 
 @extend_schema(tags=["Order"])
@@ -215,3 +226,24 @@ class BillingView(APIView):
         }
 
         return Response(invoice_data)
+
+
+class MostSoldItemsDailyAPIView(APIView):
+    def get(self, request):
+        today = now().date()  # Get today's date
+
+        most_sold = (
+            OrderItem.objects.filter(
+                order__timestamp__date=today,
+                order__payment_status=PaymentStatus.PAID,
+                order__status=OrderStatus.COMPLETED,
+            )  # Filter for today
+            .values("menu__id", "menu__name")
+            .annotate(
+                total_sold=Sum("quantity"),
+                total_amount=Sum(F("quantity") * F("menu__price")),
+            )
+            .order_by("-total_sold")[:5]  # Get top 5 items
+        )
+
+        return Response({"most_sold_items": most_sold})
